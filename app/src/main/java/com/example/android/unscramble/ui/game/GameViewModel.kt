@@ -29,96 +29,84 @@ import androidx.lifecycle.ViewModel
  * ViewModel containing the app data and methods to process the data
  */
 class GameViewModel : ViewModel() {
-    private val _score = MutableLiveData(0)
-    val score: LiveData<Int>
+
+    private var _score = 0
+    private var _counter = 0
+    private var _currentScrambledWord = "test"
+    private var _currentWordCount = 0
+
+    val score: Int
         get() = _score
 
-    private val _currentWordCount = MutableLiveData(0)
-    val currentWordCount: LiveData<Int>
+    val counter: Int
+        get() = _counter
+
+    val currentScrambledWord: String
+        get() = _currentScrambledWord
+
+    val currentWordCount: Int
         get() = _currentWordCount
 
-    private val _currentScrambledWord = MutableLiveData<String>()
-    val currentScrambledWord: LiveData<Spannable> = Transformations.map(_currentScrambledWord) {
-        if (it == null) {
-            SpannableString("")
-        } else {
-            val scrambledWord = it.toString()
-            val spannable: Spannable = SpannableString(scrambledWord)
-            spannable.setSpan(
-                    TtsSpan.VerbatimBuilder(scrambledWord).build(),
-                    0,
-                    scrambledWord.length,
-                    Spannable.SPAN_INCLUSIVE_INCLUSIVE
-            )
-            spannable
-        }
-    }
-
-    // List of words used in the game
+    // hold a list of words you use in the game, to avoid repetitions
     private var wordsList: MutableList<String> = mutableListOf()
-    private lateinit var currentWord: String
+    private lateinit var currentWord: String // counter
 
     init {
         getNextWord()
     }
 
-    /*
-     * Updates currentWord and currentScrambledWord with the next word.
-     */
     private fun getNextWord() {
+
+        // random word
         currentWord = allWordsList.random()
+
+        // temp word
         val tempWord = currentWord.toCharArray()
         tempWord.shuffle()
 
+        //  shuffled order of characters is the same as the original word
         while (String(tempWord).equals(currentWord, false)) {
+            // if true
+            // keep shuffle()
             tempWord.shuffle()
-        }
+        }// end while
+
+        // check if a word has been used already
         if (wordsList.contains(currentWord)) {
             getNextWord()
         } else {
-            Log.d("Unscramble", "currentWord= $currentWord")
-            _currentScrambledWord.value = String(tempWord)
-            _currentWordCount.value = _currentWordCount.value?.inc()
+            _currentScrambledWord = String(tempWord)
+            ++_currentWordCount
             wordsList.add(currentWord)
-        }
-    }
+        }// end else
 
-    /*
-     * Re-initializes the game data to restart the game.
-     */
-    fun reinitializeData() {
-        _score.value = 0
-        _currentWordCount.value = 0
-        wordsList.clear()
-        getNextWord()
-    }
+    } // end getNextWord
 
-    /*
-    * Increases the game score if the player’s word is correct.
-    */
+    fun nextWord(): Boolean {
+        return if (currentWordCount < MAX_NO_OF_WORDS) {
+            getNextWord()
+            true
+        } else false
+    }//end nextWord
+
     private fun increaseScore() {
-        _score.value = _score.value?.plus(SCORE_INCREASE)
-    }
+        _score += SCORE_INCREASE
+    }// end increaseScore
 
-    /*
-    * Returns true if the player word is correct.
-    * Increases the score accordingly.
-    */
     fun isUserWordCorrect(playerWord: String): Boolean {
         if (playerWord.equals(currentWord, true)) {
             increaseScore()
             return true
-        }
-        return false
-    }
+        } else
+            return false
+    }// end isUserWordCorrect
 
-    /*
-    * Returns true if the current word count is less than MAX_NO_OF_WORDS
-    */
-    fun nextWord(): Boolean {
-        return if (_currentWordCount.value!! < MAX_NO_OF_WORDS) {
-            getNextWord()
-            true
-        } else false
-    }
-}
+    fun reinitializeData() {
+        _score = 0
+        _currentWordCount = 0
+        wordsList.clear()
+        getNextWord()
+    }// end reinitializeData
+
+
+}// end view model
