@@ -45,7 +45,7 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout XML file and return a binding object instance
-        binding = GameFragmentBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater,R.layout.game_fragment, container, false)
         return binding.root
     }// end onCreateView
 
@@ -66,20 +66,20 @@ class GameFragment : Fragment() {
 
 
         // Observe the scrambledCharArray LiveData, passing in the LifecycleOwner and the observer.
-        viewModel.currentScrambledWord.observe(viewLifecycleOwner,
-            { newWord ->
-                binding.textViewUnscrambledWord.text = newWord
-            })
-        viewModel.score.observe(viewLifecycleOwner,
-            { newScore ->
-                binding.score.text = getString(R.string.score, newScore)
-            })
-
-        viewModel.currentWordCount.observe(viewLifecycleOwner,
-            { newWordCount ->
-                binding.wordCount.text =
-                    getString(R.string.word_count, newWordCount, MAX_NO_OF_WORDS)
-            })
+//        viewModel.currentScrambledWord.observe(viewLifecycleOwner,
+//            { newWord ->
+//                binding.textViewUnscrambledWord.text = newWord
+//            })
+//        viewModel.score.observe(viewLifecycleOwner,
+//            { newScore ->
+//                binding.score.text = getString(R.string.score, newScore)
+//            })
+//
+//        viewModel.currentWordCount.observe(viewLifecycleOwner,
+//            { newWordCount ->
+//                binding.wordCount.text =
+//                    getString(R.string.word_count, newWordCount, MAX_NO_OF_WORDS)
+//            })
     }// end onViewCreated
 
     /*
